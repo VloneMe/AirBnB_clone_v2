@@ -2,7 +2,7 @@
 """ Console Module """
 import cmd
 import sys
-from datetime import datetime
+import uuid
 from models.base_model import BaseModel
 from models.__init__ import storage
 from models.user import User
@@ -114,58 +114,67 @@ class HBNBCommand(cmd.Cmd):
         """ Overrides the emptyline method of CMD """
         pass
 
-    def do_create(self, args):
-        """ 
-        Create an object of any class with given parameters
+    def do_create(self, arg):
         """
-        if not args:
+        Create an object with given parameters.
+        """
+        if not arg:
             print("** class name missing **")
             return
 
-        args = args.split()  # Split the arguments by spaces
-        class_name = args[0]  # First argument is the class name
-        params = args[1:]  # Rest of the arguments are parameters
+        args = arg.split()
+        class_name = args[0]
+        param_strings = args[1:]
 
-        """
-        # Check if the class exists"""
         if class_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
 
-        """
-        # Initialize an empty dictionary for the object's attributes
-        """
-        obj_attrs = {}
+        params = {}
 
-        """
-        # Iterate through parameters to parse and add them to obj_attrs
-        """
-        for param in params:
-            param_parts = param.split('=')
+        for param_string in param_strings:
+            # Split each parameter into key and value using '=' as separator
+            param_parts = param_string.split('=')
 
-            if len(param_parts) == 2:
-                key, value = param_parts
-                if value.startswith('"') and value.endswith('"'):
-                    value = value[1:-1].replace('\\"', '"').replace('_', ' ')
-                elif '.' in value:
-                    try:
-                        value = float(value)
-                    except ValueError:
-                        pass
-                else:
-                    try:
-                        value = int(value)
-                    except ValueError:
-                        pass
+            if len(param_parts) != 2:
+                print(f"Skipping invalid parameter: {param_string}")
+                continue
 
-                obj_attrs[key] = value
+            key = param_parts[0]
+            value = param_parts[1]
 
-        if 'updated_at' not in obj_attrs:
-            obj_attrs['updated_at'] = datetime.now()
+            if value.startswith('"') and value.endswith('"'):
+                # String value, remove surrounding double quotes and replace underscores
+                value = value[1:-1].replace('_', ' ')
+                # Unescape double quotes
+                value = value.replace('\\"', '"')
+            elif '.' in value:
+                # Float value
+                try:
+                    value = float(value)
+                except ValueError:
+                    print(f"Skipping invalid float parameter: {param_string}")
+                    continue
+            else:
+                # Integer value
+                try:
+                    value = int(value)
+                except ValueError:
+                    print(f"Skipping invalid integer parameter: {param_string}")
+                    continue
+
+            params[key] = value
+
+        # Check if the 'id' attribute is missing, and if so, generate a new one
+        if 'id' not in params:
+            params['id'] = str(uuid.uuid4())  # Generate a new ID
+
+        new_instance = HBNBCommand.classes[class_name](**params)
         
-        new_instance = HBNBCommand.classes[class_name](**obj_attrs)
-        storage.save()
-        print(new_instance.id)
+        if hasattr(new_instance, 'id'):
+            print(new_instance.id)
+        else:
+            print("** 'id' attribute missing **")
         storage.save()
 
     def help_create(self):
