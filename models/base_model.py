@@ -11,26 +11,15 @@ class BaseModel:
         if not kwargs:
             from models import storage
             self.id = str(uuid.uuid4())
-            current_time = datetime.now()
-            self.created_at = current_time
-            self.updated_at = current_time
+            self.created_at = datetime.now()
+            self.updated_at = datetime.now()
             storage.new(self)
         else:
-            # Check if 'created_at' and 'updated_at' keys are missing in kwargs
-            if 'created_at' not in kwargs:
-                kwargs['created_at'] = datetime.now().isoformat()
-
-            if 'updated_at' not in kwargs:
-                kwargs['updated_at'] = datetime.now().isoformat()
-
-            # Use pop method with a default value to delete '__class__' key
-            kwargs.pop('__class__', None)
-
-            kwargs['updated_at'] = datetime.strptime(kwargs['updated_at']
-                    , '%Y-%m-%dT%H:%M:%S.%f')
-            kwargs['created_at'] = datetime.strptime(kwargs['created_at']
-                    , '%Y-%m-%dT%H:%M:%S.%f')
-            
+            kwargs['updated_at'] = datetime.strptime(kwargs['updated_at'],
+                                                     '%Y-%m-%dT%H:%M:%S.%f')
+            kwargs['created_at'] = datetime.strptime(kwargs['created_at'],
+                                                     '%Y-%m-%dT%H:%M:%S.%f')
+            del kwargs['__class__']
             self.__dict__.update(kwargs)
 
     def __str__(self):

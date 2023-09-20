@@ -2,7 +2,7 @@
 """ Console Module """
 import cmd
 import sys
-import uuid
+from datetime import datetime
 from models.base_model import BaseModel
 from models.__init__ import storage
 from models.user import User
@@ -24,6 +24,26 @@ class HBNBCommand(cmd.Cmd):
                'State': State, 'City': City, 'Amenity': Amenity,
                'Review': Review
               }
+
+    valid_keys = {
+        "BaseModel": ["id", "created_at", "updated_at"],
+        "User": [
+            "id", "created_at", "updated_at", "email",
+            "password", "first_name", "last_name",
+        ],
+        "City": ["id", "created_at", "updated_at", "state_id", "name"],
+        "State": ["id", "created_at", "updated_at", "name"],
+        "Place": [
+            "id", "created_at", "updated_at", "city_id", "user_id",
+            "name",  "description", "number_rooms", "number_bathrooms",
+            "max_guest", "price_by_night", "latitude", "longitude",
+            "amenity_ids"
+        ],
+        "Amenity": ["id", "created_at", "updated_at", "name"],
+        "Review": ["id", "created_at", "updated_at",
+                   "place_id", "user_id", "text"],
+    }
+
     dot_cmds = ['all', 'count', 'show', 'destroy', 'update']
     types = {
              'number_rooms': int, 'number_bathrooms': int,
@@ -74,7 +94,7 @@ class HBNBCommand(cmd.Cmd):
                 pline = pline[2].strip()  # pline is now str
                 if pline:
                     # check for *args or **kwargs
-                    if pline[0] == '{' and pline[-1] == '}'\
+                    if pline[0] == '{' and pline[-1] =='}'\
                             and type(eval(pline)) == dict:
                         _args = pline
                     else:
@@ -114,63 +134,70 @@ class HBNBCommand(cmd.Cmd):
         """ Overrides the emptyline method of CMD """
         pass
 
-    def do_create(self, arg):
+    def parse_value(self, value):
         """
-        Create an object with given parameters.
+        Parse the attribute value based on its data type.
         """
-        if not arg:
+        try:
+            # Attempt to parse the value as an integer
+            return int(value)
+        except ValueError:
+            try:
+                # Attempt to parse the value as a float
+                return float(value)
+            except ValueError:
+                if value.startswith('"') and value.endswith('"'):
+                    return value[1:-1].replace('_', ' ')
+                else:
+                    return value  # Return as is (string)
+
+    def do_create(self, args):
+        """
+        Create an object of any class with specified attributes.
+        """
+        if not args:
             print("** class name missing **")
             return
 
-        args = arg.split()
-        class_name = args[0]
-        param_strings = args[1:]
+        # Split the input into params
+        params = args.split()
 
+        # Extract the class name from the first param
+        class_name = params[0]
+
+        # Check if the class exists
         if class_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
 
-        params = {}
-
+        # Create a new instance of the class
         new_instance = HBNBCommand.classes[class_name]()
 
-        for param_string in param_strings:
-            # Split each parameter into key and value using '=' as separator
-            param_parts = param_string.split('=')
+        # Process attribute assignments (key=value)
+        for param in params[1:]:
+            # Split each param into key and value
+            key_value = param.split('=')
 
-            if len(param_parts) != 2:
-                print(f"Skipping invalid parameter: {param_string}")
+            if len(key_value) != 2:
+                print("** invalid parameter format **")
                 continue
 
-            key = param_parts[0]
-            value = param_parts[1]
+            key, value = key_value[0], key_value[1]
 
-            if value.startswith('"') and value.endswith('"'):
-                value = value[1:-1].replace('_', ' ')
-                # Unescape double quotes
-                value = value.replace('\\"', '"')
-            elif '.' in value:
-                # Float value
-                try:
-                    value = float(value)
-                except ValueError:
-                    print(f"Skipping invalid float parameter: {param_string}")
-                    continue
-            else:
-                # Integer value
-                try:
-                    value = int(value)
-                except ValueError:
-                    print(
-                            f"Skipping invalid integer parameter:
-                            {param_string}"
-                            )
-                    continue
+            # Check if the key is valid for the class
+            if key not in HBNBCommand.valid_keys[class_name]:
+                print(f"** invalid attribute '{key}' for class '{class_name}' **")
+                continue
 
-            params[key] = value
+            # Parse and set the attribute value
+            parsed_value = self.parse_value(value)
+            if parsed_value is not None:
+                setattr(new_instance, key, parsed_value)
 
-        setattr(new_instance, key, value)
-        storage.save()
+        # Save the new instance to storage
+        new_instance.save()
+
+        # Print the ID of the created instance
         print(new_instance.id)
 
     def help_create(self):
@@ -366,7 +393,6 @@ class HBNBCommand(cmd.Cmd):
         """ Help information for the update class """
         print("Updates an object with new information")
         print("Usage: update <className> <id> <attName> <attVal>\n")
-
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
