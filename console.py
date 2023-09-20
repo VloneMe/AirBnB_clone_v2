@@ -132,6 +132,8 @@ class HBNBCommand(cmd.Cmd):
 
         params = {}
 
+        new_instance = HBNBCommand.classes[class_name]()
+
         for param_string in param_strings:
             # Split each parameter into key and value using '=' as separator
             param_parts = param_string.split('=')
@@ -165,10 +167,9 @@ class HBNBCommand(cmd.Cmd):
 
             params[key] = value
 
-        new_instance = HBNBCommand.classes[class_name](**params)
+        setattr(new_instance, key, value)
         storage.save()
         print(new_instance.id)
-        storage.save()
 
     def help_create(self):
         """ Help information for the create method """
