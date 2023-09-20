@@ -165,16 +165,9 @@ class HBNBCommand(cmd.Cmd):
 
             params[key] = value
 
-        # Check if the 'id' attribute is missing, and if so, generate a new one
-        if 'id' not in params:
-            params['id'] = str(uuid.uuid4())  # Generate a new ID
-
         new_instance = HBNBCommand.classes[class_name](**params)
-        
-        if hasattr(new_instance, 'id'):
-            print(new_instance.id)
-        else:
-            print("** 'id' attribute missing **")
+        storage.save()
+        print(new_instance.id)
         storage.save()
 
     def help_create(self):
