@@ -74,7 +74,7 @@ class HBNBCommand(cmd.Cmd):
                 pline = pline[2].strip()  # pline is now str
                 if pline:
                     # check for *args or **kwargs
-                    if pline[0] == '{' and pline[-1] =='}'\
+                    if pline[0] == '{' and pline[-1] == '}'\
                             and type(eval(pline)) == dict:
                         _args = pline
                     else:
@@ -146,7 +146,6 @@ class HBNBCommand(cmd.Cmd):
             value = param_parts[1]
 
             if value.startswith('"') and value.endswith('"'):
-                # String value, remove surrounding double quotes and replace underscores
                 value = value[1:-1].replace('_', ' ')
                 # Unescape double quotes
                 value = value.replace('\\"', '"')
@@ -162,7 +161,10 @@ class HBNBCommand(cmd.Cmd):
                 try:
                     value = int(value)
                 except ValueError:
-                    print(f"Skipping invalid integer parameter: {param_string}")
+                    print(
+                            f"Skipping invalid integer parameter:
+                            {param_string}"
+                            )
                     continue
 
             params[key] = value
@@ -364,6 +366,7 @@ class HBNBCommand(cmd.Cmd):
         """ Help information for the update class """
         print("Updates an object with new information")
         print("Usage: update <className> <id> <attName> <attVal>\n")
+
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
