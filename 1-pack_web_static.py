@@ -1,28 +1,36 @@
 #!/usr/bin/python3
 # Fabric script that generates a .tgz archive from the contents of the web_static
 
-import os.path
-from datetime import datetime
 from fabric.api import local
+from datetime import datetime
+import os
 
 def do_pack():
-    """Create a tar gzipped archive of the directory web_static."""
+    """
+    Generates a .tgz archive from the contents of the web_static folder.
+    """
+    try:
+        # Create the 'versions' folder if it doesn't exist
+        if not os.path.exists('versions'):
+            os.makedirs('versions')
 
-    # Get the current timestamp
-    dtime = datetime.utcnow()
+        # Create the archive name using the current timestamp
+        now = datetime.now()
+        archive_name = "web_static_{}{}{}{}{}{}.tgz".format(
+            now.year, now.month, now.day, now.hour, now.minute, now.second
+        )
 
-    # Define the archive file name with the current timestamp
-    file = "versions/web_static_{}{}{}{}{}{}.tgz".format(
-    dtime.year, dtime.month, dtime.day, dtime.hour, dtime.minute, dtime.second)
+        # Compress the contents of the 'web_static' folder into the archive
+        local("tar -czvf versions/{} web_static".format(archive_name))
 
-    # Check if the 'versions' directory exists; if not, create it
-    if os.path.isdir("versions") is False:
-        if local("mkdir -p versions").failed is True:
-            return None
-
-    # Create the .tgz archive from the 'web_static' directory
-    if local("tar -cvzf {} web_static".format(file)).failed is True:
+        # Return the archive path if the archive has been generated successfully
+        return "versions/{}".format(archive_name)
+    except Exception as e:
         return None
 
-    # Return the path to the created archive
-    return file
+if __name__ == "__main__":
+    result = do_pack()
+    if result:
+        print("Archive created: {}".format(result))
+    else:
+        print("Archive creation failed.")
