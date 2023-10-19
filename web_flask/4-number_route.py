@@ -48,7 +48,7 @@ A route that takes an integer parameter 'n'
 @app.route('/number/<int:n>', strict_slashes=False)
 def is_number(n):
     """ displays if n is interger """
-    return "%d is a number" % n
+    return f"{n} is a number"
 
 if __name__ == '__main__':
     """ This runs the Flask app on 0.0.0.0 and port 5000 """
