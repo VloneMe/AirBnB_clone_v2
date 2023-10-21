@@ -6,19 +6,29 @@ A script that starts a Flask web application.
 from flask import Flask
 
 """
-# Create a Flask web application"""
+Create a Flask web application
+"""
 app = Flask(__name__)
 
 """"
-A route for the root URL ('/') with strict_slashes=False """
+A route for the root URL ('/') with strict_slashes=False
+"""
+
+
 @app.route('/', strict_slashes=False)
 def hello_hbnb():
     return "Hello HBNB!"
 
-# A route for '/hbnb' with strict_slashes=False
+
+"""
+A route for '/hbnb' with strict_slashes=False
+"""
+
+
 @app.route('/hbnb', strict_slashes=False)
 def hbnb():
     return "HBNB"
+
 
 if __name__ == '__main__':
     """ # This runs the Flask app on 0.0.0.0 and port 5000 """
