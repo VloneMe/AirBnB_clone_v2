@@ -12,18 +12,28 @@ app = Flask(__name__)
 """"
 A route for the root URL ('/') with strict_slashes=False.
 """
+
+
 @app.route('/', strict_slashes=False)
 def hello_hbnb():
     return "Hello HBNB!"
 
+
+"""
 # A route for '/hbnb' with strict_slashes=False
+"""
+
+
 @app.route('/hbnb', strict_slashes=False)
 def hbnb():
     return "HBNB"
 
+
 """
 A route that takes a text parameter and displays it
 """
+
+
 @app.route('/c/<text>', strict_slashes=False)
 def display_text(text):
     """
@@ -32,9 +42,13 @@ def display_text(text):
     text = text.replace('_', ' ')
     return "C " + text
 
+
 """
-A route that takes a text parameter and displays it (with default value "is cool")
+A route that takes a text parameter and displays it
+(with default value "is cool")
 """
+
+
 @app.route('/python/', defaults={'text': 'is cool'}, strict_slashes=False)
 @app.route('/python/<text>', strict_slashes=False)
 def display_python(text):
@@ -42,27 +56,37 @@ def display_python(text):
     text = text.replace('_', ' ')
     return "Python " + text
 
-""" 
-A route that takes an integer parameter 'n' 
+
 """
+A route that takes an integer parameter 'n'
+"""
+
+
 @app.route('/number/<int:n>', strict_slashes=False)
 def is_number(n):
     """ displays if n is interger """
     return f"{n} is a number"
 
-""" 
-A route that takes an integer parameter 'n' and displays it in an HTML template
-"""
-@app.route('/number_template/<int:n>', strict_slashes=False)
-def number_template(n):
-    return render_template('5-number.html', n=n)
 
 """
 A route that takes an integer parameter 'n' and displays it in an HTML template
 """
+
+
+@app.route('/number_template/<int:n>', strict_slashes=False)
+def number_template(n):
+    return render_template('5-number.html', n=n)
+
+
+"""
+A route that takes an integer parameter 'n' and displays it in an HTML template
+"""
+
+
 @app.route('/number_odd_or_even/<int:n>', strict_slashes=False)
 def number_odd_or_even(n):
     return render_template('number_odd_or_even_template.html', n=n)
+
 
 if __name__ == '__main__':
     """ This runs the Flask app on 0.0.0.0 and port 5000 """
