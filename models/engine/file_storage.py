@@ -64,3 +64,10 @@ class FileStorage:
                         self.new(classes[class_name](**val))
         except FileNotFoundError:
             pass
+
+    def close(self):
+        """
+        Calls the reload() method to deserialize
+        the JSON file to objects.
+        """
+        self.reload()
