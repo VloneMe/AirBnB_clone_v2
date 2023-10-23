@@ -3,7 +3,7 @@
 A script that starts a Flask web application.
 """
 
-from flask import Flask
+from flask import Flask, render_template
 
 """
 # Create a Flask web application"""
