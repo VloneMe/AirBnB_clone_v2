@@ -44,7 +44,8 @@ def display_text(text):
 
 
 """
-A route that takes a text parameter and displays it (with default value "is cool")
+A route that takes a text parameter and displays it
+(with default value "is cool")
 """
 
 
@@ -56,8 +57,8 @@ def display_python(text):
     return "Python " + text
 
 
-""" 
-A route that takes an integer parameter 'n' 
+"""
+A route that takes an integer parameter 'n'
 """
 
 
@@ -67,7 +68,7 @@ def is_number(n):
     return f"{n} is a number"
 
 
-""" 
+"""
 A route that takes an integer parameter 'n' and displays it in an HTML template
 """
 
